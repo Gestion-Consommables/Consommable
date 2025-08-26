@@ -6,6 +6,8 @@
     <title>Gestion des Consommables - Poste Guinéenne</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <!-- Add EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root {
             --primary: hsl(143, 93%, 22%); /* Bleu foncé - Poste Guinéenne */
@@ -48,7 +50,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
             overflow-x: hidden;
         }
@@ -256,12 +258,7 @@
             gap: 35px;
         }
         
-        .dual-column {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .request-form, .email-section {
+        .request-form {
             flex: 1;
             transition: var(--transition);
         }
@@ -446,70 +443,6 @@
             font-size: 22px;
             margin-bottom: 8px;
             color: var(--success);
-        }
-        
-        /* Email Section */
-        .email-section {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 30px;
-            box-shadow: var(--shadow);
-            border-top: 5px solid var(--secondary);
-            height: 100%;
-            transition: var(--transition);
-        }
-        
-        .email-section:hover {
-            box-shadow: var(--shadow-hover);
-        }
-        
-        .email-section h3 {
-            color: var(--primary);
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 22px;
-            font-weight: 600;
-        }
-        
-        .email-section h3 i {
-            color: var(--secondary);
-            font-size: 26px;
-        }
-        
-        .email-form {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-        
-        .email-group {
-            margin-bottom: 20px;
-        }
-        
-        .email-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 18px;
-            margin-top: 15px;
-        }
-        
-        .email-preview {
-            background: white;
-            border: 1px solid #e0e6ed;
-            border-radius: var(--border-radius-sm);
-            padding: 25px;
-            margin-top: 25px;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            max-height: 300px;
-            overflow-y: auto;
-            background-color: #f8fafc;
-            border-left: 4px solid var(--primary);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-            font-size: 15px;
-            line-height: 1.7;
         }
         
         /* History Section */
@@ -747,10 +680,6 @@
         
         /* Responsive Design */
         @media (max-width: 1200px) {
-            .dual-column {
-                flex-direction: column;
-            }
-            
             .sidebar {
                 width: var(--sidebar-collapsed-width);
             }
@@ -856,7 +785,7 @@
                 gap: 15px;
             }
             
-            .equipment-form, .email-section {
+            .equipment-form {
                 padding: 25px;
             }
             
@@ -904,7 +833,7 @@
                 font-size: 18px;
             }
             
-            .form-actions, .email-actions {
+            .form-actions {
                 flex-direction: column;
                 gap: 12px;
             }
@@ -980,131 +909,94 @@
                             <div>
                                 <h3>Demande soumise avec succès!</h3>
                                 <p>Votre demande a été enregistrée sous le numéro <strong id="request-id"></strong></p>
-                                <p>Vous pouvez maintenant envoyer cette demande par email.</p>
+                                <p>Un email a été envoyé à la DSI.</p>
                             </div>
                         </div>
                         
-                        <div class="dual-column">
-                            <!-- Formulaire de demande -->
-                            <div class="request-form">
-                                <div class="equipment-form" id="consumable-form">
-                                    <h3><i class="fas fa-file-alt"></i> Formulaire de demande</h3>
-                                    <div class="form-row">
-                                        <div class="form-col">
-                                            <div class="form-group">
-                                                <label for="requester-name"><i class="fas fa-user"></i> Nom et Prénom</label>
-                                                <input type="text" id="requester-name" placeholder="Votre nom complet" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label for="consumable-type"><i class="fas fa-tag"></i> Type de consommable</label>
-                                                <select id="consumable-type" required>
-                                                    <option value="">Sélectionner un type</option>
-                                                    <option value="cartouche">Cartouche d'encre</option>
-                                                    <option value="toner">Toner</option>
-                                                    <option value="papier">Papier</option>
-                                                    <option value="batterie">Batterie</option>
-                                                    <option value="cable">Câbles</option>
-                                                    <option value="autre">Autre</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label for="consumable-model"><i class="fas fa-box"></i> Modèle/Référence</label>
-                                                <input type="text" id="consumable-model" placeholder="Ex: HP 305, Epson 003, etc." required>
-                                            </div>
+                        <!-- Formulaire de demande -->
+                        <div class="request-form">
+                            <div class="equipment-form" id="consumable-form">
+                                <h3><i class="fas fa-file-alt"></i> Formulaire de demande</h3>
+                                <div class="form-row">
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="requester-name"><i class="fas fa-user"></i> Nom et Prénom</label>
+                                            <input type="text" id="requester-name" placeholder="Votre nom complet" required>
                                         </div>
                                         
-                                        <div class="form-col">
-                                            <div class="form-group">
-                                                <label for="department"><i class="fas fa-building"></i> Département</label>
-                                                <select id="department" required>
-                                                    <option value="">Sélectionner un département</option>
-                                                    <option value="DSJ">DSJ - Direction des Systèmes d'Information</option>
-                                                    <option value="DLPMG">DLPMG - Direction de la Logistique et du Patrimoine</option>
-                                                    <option value="DG">DG - Direction Générale</option>
-                                                    <option value="DGA">DGA - Direction Générale Adjointe</option>
-                                                    <option value="DOP">DOP - Direction des Opérations Postales</option>
-                                                    <option value="DSP">DSP - Direction des Services Postaux</option>
-                                                    <option value="DCOM">DCOM - Direction de la Communication</option>
-                                                    <option value="DSI">DSI - Département des Systèmes d'Information</option>
-                                                    <option value="DGP">DGP - Département Grand Projet</option>
-                                                    <option value="DRH">DRH - Direction des Ressources Humaines</option>
-                                                    <option value="D AUDIT">D AUDIT - Direction de l'Audit</option>
-                                                    <option value="DAF">DAF - Direction Administrative et Financière</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label for="urgency"><i class="fas fa-exclamation-triangle"></i> Urgence</label>
-                                                <select id="urgency" required>
-                                                    <option value="normal">Normale</option>
-                                                    <option value="urgent">Urgent</option>
-                                                    <option value="critique">Critique</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label for="consumable-quantity"><i class="fas fa-calculator"></i> Quantité</label>
-                                                <input type="number" id="consumable-quantity" min="1" value="1" required>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="requester-email"><i class="fas fa-envelope"></i> Email</label>
+                                            <input type="email" id="requester-email" placeholder="Votre adresse email" required>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="consumable-type"><i class="fas fa-tag"></i> Type de consommable</label>
+                                            <select id="consumable-type" required>
+                                                <option value="">Sélectionner un type</option>
+                                                <option value="cartouche">Cartouche d'encre</option>
+                                                <option value="toner">Toner</option>
+                                                <option value="papier">Papier</option>
+                                                <option value="batterie">Batterie</option>
+                                                <option value="cable">Câbles</option>
+                                                <option value="autre">Autre</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="consumable-model"><i class="fas fa-box"></i> Modèle/Référence</label>
+                                            <input type="text" id="consumable-model" placeholder="Ex: HP 305, Epson 003, etc." required>
                                         </div>
                                     </div>
                                     
-                                    <div class="form-group">
-                                        <label for="consumable-reason"><i class="fas fa-comment"></i> Motif de la demande</label>
-                                        <textarea id="consumable-reason" placeholder="Détaillez pourquoi vous avez besoin de ce consommable..." required></textarea>
-                                    </div>
-                                    
-                                    <div class="form-actions">
-                                        <button type="button" class="btn btn-warning" id="cancel-consumable">
-                                            <i class="fas fa-times"></i> Annuler
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" id="submit-consumable">
-                                            <i class="fas fa-paper-plane"></i> Soumettre la demande
-                                        </button>
+                                    <div class="form-col">
+                                        <div class="form-group">
+                                            <label for="department"><i class="fas fa-building"></i> Département</label>
+                                            <select id="department" required>
+                                                <option value="">Sélectionner un département</option>
+                                                <option value="DSJ">DSJ - Direction des Systèmes d'Information</option>
+                                                <option value="DLPMG">DLPMG - Direction de la Logistique et du Patrimoine</option>
+                                                <option value="DG">DG - Direction Générale</option>
+                                                <option value="DGA">DGA - Direction Générale Adjointe</option>
+                                                <option value="DOP">DOP - Direction des Opérations Postales</option>
+                                                <option value="DSP">DSP - Direction des Services Postales</option>
+                                                <option value="DCOM">DCOM - Direction de la Communication</option>
+                                                <option value="DSI">DSI - Département des Systèmes d'Information</option>
+                                                <option value="DGP">DGP - Département Grand Projet</option>
+                                                <option value="DRH">DRH - Direction des Ressources Humaines</option>
+                                                <option value="D AUDIT">D AUDIT - Direction de l'Audit</option>
+                                                <option value="DAF">DAF - Direction Administrative et Financière</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="urgency"><i class="fas fa-exclamation-triangle"></i> Urgence</label>
+                                            <select id="urgency" required>
+                                                <option value="normal">Normale</option>
+                                                <option value="urgent">Urgente</option>
+                                                <option value="critique">Critique</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="consumable-quantity"><i class="fas fa-calculator"></i> Quantité</label>
+                                            <input type="number" id="consumable-quantity" min="1" value="1" required>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Section d'envoi par email -->
-                            <div class="email-section">
-                                <h3><i class="fas fa-envelope"></i> Envoyer par email</h3>
                                 
-                                <form class="email-form" id="email-form">
-                                    <div class="email-group">
-                                        <label for="email-from">De</label>
-                                        <input type="email" id="email-from" placeholder="Votre adresse email" required>
-                                    </div>
-                                    
-                                    <div class="email-group">
-                                        <label for="email-to">À</label>
-                                        <input type="email" id="email-to" value="dsi@laposte.gn" required>
-                                    </div>
-                                    
-                                    <div class="email-group">
-                                        <label for="email-subject">Sujet</label>
-                                        <input type="text" id="email-subject" placeholder="Sujet de l'email" required>
-                                    </div>
-                                    
-                                    <div class="email-group">
-                                        <label for="email-message">Message</label>
-                                        <textarea id="email-message" placeholder="Votre message..." rows="5"></textarea>
-                                    </div>
-                                    
-                                    <div class="email-preview" id="email-preview">
-                                        Aucune demande disponible. Veuillez d'abord soumettre une demande.
-                                    </div>
-                                    
-                                    <div class="email-actions">
-                                        <button type="button" class="btn btn-warning" id="preview-email">
-                                            <i class="fas fa-eye"></i> Prévisualiser
-                                        </button>
-                                        <button type="submit" class="btn btn-email">
-                                            <i class="fas fa-paper-plane"></i> Envoyer l'email
-                                        </button>
-                                    </div>
-                                </form>
+                                <div class="form-group">
+                                    <label for="consumable-reason"><i class="fas fa-comment"></i> Motif de la demande</label>
+                                    <textarea id="consumable-reason" placeholder="Détaillez pourquoi vous avez besoin de ce consommable..." required></textarea>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-warning" id="cancel-consumable">
+                                        <i class="fas fa-times"></i> Annuler
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="submit-consumable">
+                                        <i class="fas fa-paper-plane"></i> Soumettre la demande
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1164,7 +1056,7 @@
             <div class="modal-body">
                 <i class="fas fa-check-circle"></i>
                 <h3>Email envoyé avec succès!</h3>
-                <p>Votre demande a été envoyée par email au destinataire.</p>
+                <p>Votre demande a été envoyée par email à la DSI.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">
@@ -1175,6 +1067,10 @@
     </div>
     
     <script>
+        // Initialize EmailJS with your Public Key
+        // Replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
+        emailjs.init("YOUR_PUBLIC_KEY");
+        
         // Variables globales
         let currentRequest = null;
         let requests = [];
@@ -1218,17 +1114,6 @@
                 document.getElementById('success-message').style.display = 'none';
             });
             
-            // Prévisualiser l'email
-            document.getElementById('preview-email').addEventListener('click', function() {
-                updateEmailPreview();
-            });
-            
-            // Soumission du formulaire d'email
-            document.getElementById('email-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                sendEmail();
-            });
-            
             // Export Excel
             document.getElementById('export-excel').addEventListener('click', function() {
                 exportToExcel();
@@ -1270,7 +1155,9 @@
                 model: document.getElementById('consumable-model').value,
                 department: document.getElementById('department').value,
                 requester: document.getElementById('requester-name').value,
+                email: document.getElementById('requester-email').value,
                 date: new Date().toLocaleDateString('fr-FR'),
+                time: new Date().toLocaleTimeString('fr-FR'),
                 quantity: parseInt(document.getElementById('consumable-quantity').value),
                 urgency: document.getElementById('urgency').value,
                 reason: document.getElementById('consumable-reason').value,
@@ -1280,8 +1167,8 @@
             // Ajouter à l'historique
             requests.push(currentRequest);
             
-            // Mettre à jour la prévisualisation de l'email
-            updateEmailPreview();
+            // Envoyer l'email en temps réel
+            sendEmailToDSI();
             
             // Faire défiler vers le message de succès
             successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1296,6 +1183,7 @@
         function validateForm() {
             const requiredFields = [
                 'requester-name', 
+                'requester-email',
                 'consumable-type', 
                 'consumable-model',
                 'department',
@@ -1321,68 +1209,57 @@
                 }
             });
             
+            // Validate email format
+            const emailField = document.getElementById('requester-email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                emailField.style.borderColor = 'var(--danger)';
+                isValid = false;
+                
+                emailField.classList.add('pulse-animation');
+                setTimeout(() => {
+                    emailField.classList.remove('pulse-animation');
+                }, 1000);
+            }
+            
             return isValid;
         }
         
-        // Mettre à jour la prévisualisation de l'email
-        function updateEmailPreview() {
-            const preview = document.getElementById('email-preview');
+        // Envoyer l'email en temps réel à la DSI
+        function sendEmailToDSI() {
+            if (!currentRequest) return;
             
-            if (!currentRequest) {
-                preview.textContent = "Aucune demande disponible. Veuillez d'abord soumettre une demande.";
-                return;
-            }
+            // Préparer les paramètres de l'email
+            const templateParams = {
+                to_email: 'dsi@laposte.gn',
+                from_name: currentRequest.requester,
+                from_email: currentRequest.email,
+                request_id: currentRequest.id,
+                requester: currentRequest.requester,
+                department: currentRequest.department,
+                consumable_type: getConsumableName(currentRequest.type),
+                model: currentRequest.model,
+                quantity: currentRequest.quantity,
+                urgency: getUrgencyName(currentRequest.urgency),
+                date: currentRequest.date,
+                time: currentRequest.time,
+                reason: currentRequest.reason
+            };
             
-            // Récupérer les valeurs du formulaire d'email
-            const subject = document.getElementById('email-subject').value || "Demande de consommables";
-            const message = document.getElementById('email-message').value || "Veuillez trouver ci-joint ma demande de consommables.";
-            
-            // Générer le contenu de l'email
-            const emailContent = `
-Objet: ${subject}
-
-${message}
-
-Détails de la demande:
---------------------------------
-ID: ${currentRequest.id}
-Demandeur: ${currentRequest.requester}
-Département: ${currentRequest.department}
-Type de consommable: ${getConsumableName(currentRequest.type)}
-Modèle/Référence: ${currentRequest.model}
-Quantité: ${currentRequest.quantity}
-Urgence: ${getUrgencyName(currentRequest.urgency)}
-Date: ${currentRequest.date}
-
-Motif:
-${currentRequest.reason}
---------------------------------
-
-Cordialement,
-${currentRequest.requester}
-            `;
-            
-            preview.textContent = emailContent;
-        }
-        
-        // Envoyer l'email (simulation)
-        function sendEmail() {
-            if (!currentRequest) {
-                alert("Veuillez d'abord soumettre une demande.");
-                return;
-            }
-            
-            // Validation de l'email
-            const emailFrom = document.getElementById('email-from').value;
-            const emailTo = document.getElementById('email-to').value;
-            
-            if (!emailFrom || !emailTo) {
-                alert("Veuillez remplir les champs 'De' et 'À'.");
-                return;
-            }
-            
-            // Afficher la modal de confirmation
-            document.getElementById('emailModal').style.display = 'flex';
+            // Envoyer l'email avec EmailJS
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                .then(function(response) {
+                    console.log('Email envoyé avec succès!', response.status, response.text);
+                    // Afficher la modal de confirmation
+                    document.getElementById('emailModal').style.display = 'flex';
+                    
+                    // Mettre à jour le statut de la demande
+                    currentRequest.emailSent = true;
+                    currentRequest.sentAt = new Date().toLocaleString('fr-FR');
+                }, function(error) {
+                    console.log('Erreur lors de l\'envoi de l\'email', error);
+                    alert("Erreur lors de l'envoi de l'email. Veuillez contacter la DSI directement.");
+                });
         }
         
         // Charger le tableau d'historique
